@@ -1,0 +1,8 @@
+# files in src folder which were ignored
+
+cmake_install.cmake
+CMakeCache.txt
+Makefile
+/CMakeFiles
+CMakeLists.txt
+hash_table
