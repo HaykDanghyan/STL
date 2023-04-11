@@ -154,7 +154,10 @@ size_t List<T>::size() const {
 
 template <typename T>
 void List<T>::clear() {
-    while (m_head != m_tail->next) {
+    if (head == nullptr) {
+        return;
+    }
+    while (m_head != m_tail) {
         ListNode* curr = m_head;
         m_head = m_head->next;
         delete curr;
