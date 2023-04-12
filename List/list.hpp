@@ -52,14 +52,6 @@ List<T>::List(std::initializer_list<T> init) : m_head{nullptr}, m_tail{nullptr},
 }
 
 template <typename T>
-template <typename _InputIt>
-List<T>::List(_InputIt begin, _InputIt end) {
-    for (auto it = begin; it != end; ++it) {
-        push_back(*it);
-    }
-}
-
-template <typename T>
 List<T>::~List() {
     clear();
 }
@@ -154,7 +146,7 @@ size_t List<T>::size() const {
 
 template <typename T>
 void List<T>::clear() {
-    if (head == nullptr) {
+    if (m_head == nullptr) {
         return;
     }
     while (m_head != m_tail) {
@@ -169,51 +161,59 @@ void List<T>::clear() {
 }
 
 template <typename T>
-void List<T>::push_back(const T& val) {
-    ++m_size;
-    if (m_head == nullptr) {
-        m_head = new ListNode(val);
-        m_tail = m_head;
-        return;
+void List<T>::push_back(const T& value) {
+    ListNode* new_node = new ListNode(value);
+    if (m_tail == nullptr) {
+        m_head = new_node;
+        m_tail = new_node;
+    } else {
+        new_node->prev = m_tail;
+        m_tail->next = new_node;
+        m_tail = new_node;
     }
-    m_tail->next = new ListNode(val, nullptr, m_tail);
-    m_tail = m_tail->next;
+    ++m_size;
 }
 
 template <typename T>
-void List<T>::push_back(T&& val) {
-    ++m_size;
-    if (m_head == nullptr) {
-        m_head = new ListNode(val);
-        m_tail = m_head;
-        return;
+void List<T>::push_back(T&& value) {
+    ListNode* new_node = new ListNode(value);
+    if (m_tail == nullptr) {
+        m_head = new_node;
+        m_tail = new_node;
+    } else {
+        new_node->prev = m_tail;
+        m_tail->next = new_node;
+        m_tail = new_node;
     }
-    m_tail->next = new ListNode(val, nullptr, m_tail);
-    m_tail = m_tail->next;
+    ++m_size;
 }
 
 template <typename T>
-void List<T>::push_front(const T& val) {
-    ++m_size;
+void List<T>::push_front(const T& value) {
+    ListNode* new_node = new ListNode(value);
     if (m_head == nullptr) {
-        m_head = new ListNode(val);
-        m_tail = m_head;
-        return;
+        m_head = new_node;
+        m_tail = new_node;
+    } else {
+        new_node->next = m_head;
+        m_head->prev = new_node;
+        m_head = new_node;
     }
-    m_head->prev = new ListNode(val, m_head, nullptr);
-    m_head = m_head->prev;
+    ++m_size;
 }
 
 template <typename T>
-void List<T>::push_front(T&& val) {
-    ++m_size;
+void List<T>::push_front(T&& value) {
+    ListNode* new_node = new ListNode(value);
     if (m_head == nullptr) {
-        m_head = new ListNode(val);
-        m_tail = m_head;
-        return;
+        m_head = new_node;
+        m_tail = new_node;
+    } else {
+        new_node->next = m_head;
+        m_head->prev = new_node;
+        m_head = new_node;
     }
-    m_head->prev = new ListNode(val, m_head, nullptr);
-    m_head = m_head->prev;
+    ++m_size;
 }
 
 template <typename T>
@@ -362,8 +362,37 @@ typename List<T>::iterator List<T>::erase(iterator pos) {
 }
 
 template <typename T>
-typename List<T>::iterator List<T>::insert(iterator pos) {
+typename List<T>::iterator List<T>::insert(iterator pos, const T& value) {
+    ListNode* node = pos.curr;
+    if (node == nullptr) {
+        push_back(value);
+    }
+    else if (node == m_head) {
+        push_front(value);
+    } else {
+        ListNode* new_node = new ListNode(value, node, node->prev);
+        node->prev->next = new_node;
+        node->prev = new_node;
+        ++m_size;
+    }
+    return pos;
+}
 
+template <typename T>
+typename List<T>::iterator List<T>::insert(iterator pos, T&& value) {
+    ListNode* node = pos.curr;
+    if (node == nullptr) {
+        push_back(value);
+    }
+    else if (node == m_head) {
+        push_front(value);
+    } else {
+        ListNode* new_node = new ListNode(value, node, node->prev);
+        node->prev->next = new_node;
+        node->prev = new_node;
+        ++m_size;
+    }
+    return pos;
 }
 
 template <typename T>
@@ -378,10 +407,10 @@ typename List<T>::iterator List<T>::end() const noexcept {
 
 template <typename T>
 typename List<T>::iterator List<T>::rbegin() const noexcept {
-    return iterator(m_head->prev);
+    return iterator(m_tail);
 }
 
 template <typename T>
 typename List<T>::iterator List<T>::rend() const noexcept {
-    return iterator(m_tail);
+    return iterator(m_head->prev);
 }

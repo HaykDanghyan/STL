@@ -20,6 +20,7 @@ private:
 
 public:
     class iterator : public std::iterator<std::bidirectional_iterator_tag, T> {
+    friend class List<T>;
     public:
         iterator() : curr{nullptr} {}
         iterator(ListNode* rhs) : curr{rhs} {}
@@ -60,8 +61,7 @@ public:
     List(const List<T>&);
     List(List<T>&&);
     List(std::initializer_list<T>);
-    template <typename _InputIt>
-    List(_InputIt, _InputIt);
+
     ~List(); // destructs the list
 
     List<T>& operator=(const List<T>&); // assigns values to the container
@@ -117,7 +117,8 @@ public:
 
     iterator erase(iterator); // erases the specified element from the container
 
-    iterator insert(iterator);
+    iterator insert(iterator, const T&);
+    iterator insert(iterator, T&&);
 
 };
 #include "list.hpp"
